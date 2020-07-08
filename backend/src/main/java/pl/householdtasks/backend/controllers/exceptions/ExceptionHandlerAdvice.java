@@ -1,28 +1,27 @@
 package pl.householdtasks.backend.controllers.exceptions;
 
-import net.minidev.json.JSONObject;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import pl.householdtasks.backend.controllers.utils.ResponseGenerator;
 
 @ControllerAdvice
-public class ExceptonHandlerAdvice {
+public class ExceptionHandlerAdvice {
 
     @ExceptionHandler(DisabledException.class)
     public ResponseEntity<?> handleException(DisabledException e) {
-        JSONObject object = new JSONObject();
-        object.put("message", "User is disabled");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(object);
+        return ResponseGenerator.createBadRequestWithMessage("User is disabled");
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleException(BadCredentialsException e) {
-        JSONObject object = new JSONObject();
-        object.put("message", "Wrong credentials");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(object);
+        return ResponseGenerator.createBadRequestWithMessage("Wrong credentials");
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleException(IllegalArgumentException e) {
+        return ResponseGenerator.createBadRequestWithMessage(e.getMessage());
+    }
 }
