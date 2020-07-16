@@ -6,5 +6,6 @@
 
 
     <include file="version\addUserTable.xml" relativeToChangelogFile="true"/>
+    <include file="version\addRolesAndGroups.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
