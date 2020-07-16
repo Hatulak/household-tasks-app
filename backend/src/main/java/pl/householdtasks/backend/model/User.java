@@ -29,6 +29,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @ManyToMany(mappedBy = "managers")
+    private Set<Group> managedGroups;
+
     @ManyToMany
     @JoinTable(
             name = "appuser_appgroups",

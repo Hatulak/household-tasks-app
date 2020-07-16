@@ -24,7 +24,8 @@ public class Group {
     private String name;
     @ManyToMany(mappedBy = "groups")
     private Set<User> members;
-    @OneToMany
+
+    @ManyToMany
     @JoinTable(
             name = "appgroup_managers",
             joinColumns = @JoinColumn(name = "group_id"),
