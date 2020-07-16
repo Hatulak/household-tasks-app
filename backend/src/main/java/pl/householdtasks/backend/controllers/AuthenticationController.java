@@ -56,7 +56,9 @@ public class AuthenticationController {
         if (userWithEmailExists) {
             return ResponseGenerator.createBadRequestWithMessage("There is an account connected to this email");
         }
-        //TODO - sprawdzenia email patternu
+        if (!userService.isEmailValid(user.getEmail())) {
+            return ResponseGenerator.createBadRequestWithMessage("Email is not correct");
+        }
 
         //TODO - wysyłka na maila linka do potwierdzenia utworzenia konta
         return ResponseEntity.ok(userDetailsService.save(user));

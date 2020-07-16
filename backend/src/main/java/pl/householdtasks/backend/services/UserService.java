@@ -6,6 +6,7 @@ import pl.householdtasks.backend.model.User;
 import pl.householdtasks.backend.repositories.UserRepository;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Service
 public class UserService {
@@ -21,6 +22,11 @@ public class UserService {
     public boolean checkIfUserWithEmailExists(String email) {
         Optional<User> byUsername = userRepository.findByEmail(email);
         return byUsername.isPresent();
+    }
+
+    public boolean isEmailValid(String email) {
+        Pattern pattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+        return pattern.matcher(email).matches();
     }
 
 }

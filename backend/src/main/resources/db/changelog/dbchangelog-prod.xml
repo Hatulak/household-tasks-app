@@ -7,5 +7,6 @@
     <include file="version\addUserTable.xml" relativeToChangelogFile="true"/>
     <include file="version\addRolesAndGroups.xml" relativeToChangelogFile="true"/>
     <include file="version\addTask.xml" relativeToChangelogFile="true"/>
+    <include file="version\addEmailVerifiedToUserTable.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

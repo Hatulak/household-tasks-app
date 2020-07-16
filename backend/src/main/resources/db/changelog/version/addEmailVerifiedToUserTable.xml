@@ -4,10 +4,12 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
+    <changeSet id="4" author="hatul">
+        <addColumn schemaName="public"
+                   tableName="appuser">
+            <column name="is_email_verified" type="boolean"/>
+        </addColumn>
 
-    <include file="version\addUserTable.xml" relativeToChangelogFile="true"/>
-    <include file="version\addRolesAndGroups.xml" relativeToChangelogFile="true"/>
-    <include file="version\addTask.xml" relativeToChangelogFile="true"/>
-    <include file="version\addEmailVerifiedToUserTable.xml" relativeToChangelogFile="true"/>
+    </changeSet>
 
 </databaseChangeLog>
