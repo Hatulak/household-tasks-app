@@ -13,8 +13,7 @@ import java.util.Date;
 @Table(name = "verification_tokens")
 public class VerificationToken {
 
-//    public static final int EXPIRATION = 60 * 24;
-public static final int EXPIRATION = 1;
+    public static final int EXPIRATION = 60 * 24;
 
     @Id
     @Column(name = "verification_token_id")
