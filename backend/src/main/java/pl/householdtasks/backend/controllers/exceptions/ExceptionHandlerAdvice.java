@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.householdtasks.backend.controllers.utils.ResponseGenerator;
 
+import javax.mail.MessagingException;
+
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
 
@@ -22,6 +24,11 @@ public class ExceptionHandlerAdvice {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> handleException(IllegalArgumentException e) {
+        return ResponseGenerator.createBadRequestWithMessage(e.getMessage());
+    }
+
+    @ExceptionHandler(MessagingException.class)
+    public ResponseEntity<?> handleException(MessagingException e) {
         return ResponseGenerator.createBadRequestWithMessage(e.getMessage());
     }
 }

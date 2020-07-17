@@ -5,16 +5,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.householdtasks.backend.config.utils.JwtRequest;
 import pl.householdtasks.backend.config.utils.JwtResponse;
 import pl.householdtasks.backend.config.utils.JwtTokenUtil;
 import pl.householdtasks.backend.controllers.utils.ResponseGenerator;
+import pl.householdtasks.backend.model.User;
+import pl.householdtasks.backend.model.VerificationToken;
 import pl.householdtasks.backend.model.dtos.UserDTO;
 import pl.householdtasks.backend.services.JwtUserDetailsService;
 import pl.householdtasks.backend.services.UserService;
+
+import java.util.Calendar;
+import java.util.Optional;
 
 
 @RestController
@@ -31,6 +34,7 @@ public class AuthenticationController {
 
     @Autowired
     private UserService userService;
+
 
     @PostMapping(value = "/signin")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
@@ -59,9 +63,32 @@ public class AuthenticationController {
         if (!userService.isEmailValid(user.getEmail())) {
             return ResponseGenerator.createBadRequestWithMessage("Email is not correct");
         }
+        User savedUser = userService.registerNewUser(user);
 
-        //TODO - wysyłka na maila linka do potwierdzenia utworzenia konta
-        return ResponseEntity.ok(userDetailsService.save(user));
+        return ResponseEntity.ok(savedUser);
+    }
+
+    @GetMapping(value = "/signup/regitrationConfirm")
+    public ResponseEntity<?> confirmRegistration(@RequestParam("token") String token) {
+        Optional<VerificationToken> verificationToken = userService.getVerificationToken(token);
+
+        if (!verificationToken.isPresent()) {
+            return ResponseGenerator.createBadRequestWithMessage("Invalid token");
+        }
+        User user = verificationToken.get().getUser();
+        Calendar calendar = Calendar.getInstance();
+        if (isVerificationTokenExpired(verificationToken.get())) {
+            return ResponseGenerator.createBadRequestWithMessage("Token is expired");
+        }
+
+        user.setIsEmailVerified(true);
+        userService.updateUser(user);
+        return ResponseGenerator.createOkRequestWithMessage("Email has been verified");
+    }
+
+    private boolean isVerificationTokenExpired(VerificationToken token) {
+        Calendar calendar = Calendar.getInstance();
+        return token.getExpiryDate().getTime() - calendar.getTime().getTime() <= 0;
     }
 
 }

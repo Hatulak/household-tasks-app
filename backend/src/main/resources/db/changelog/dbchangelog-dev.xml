@@ -9,5 +9,6 @@
     <include file="version\addRolesAndGroups.xml" relativeToChangelogFile="true"/>
     <include file="version\addTask.xml" relativeToChangelogFile="true"/>
     <include file="version\addEmailVerifiedToUserTable.xml" relativeToChangelogFile="true"/>
+    <include file="version\addVerificationToken.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
