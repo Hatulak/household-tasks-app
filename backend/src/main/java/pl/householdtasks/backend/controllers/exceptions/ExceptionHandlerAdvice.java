@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.householdtasks.backend.controllers.utils.ResponseGenerator;
 
 import javax.mail.MessagingException;
+import javax.persistence.EntityNotFoundException;
 
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
@@ -35,6 +36,11 @@ public class ExceptionHandlerAdvice {
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<?> handleException(MissingServletRequestParameterException e) {
+        return ResponseGenerator.createBadRequestWithMessage(e.getMessage());
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<?> handleException(EntityNotFoundException e) {
         return ResponseGenerator.createBadRequestWithMessage(e.getMessage());
     }
 }

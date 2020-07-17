@@ -68,7 +68,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(savedUser);
     }
 
-    @GetMapping(value = "/signup/regitrationConfirm")
+    @GetMapping(value = "/signup/registrationConfirm")
     public ResponseEntity<?> confirmRegistration(@RequestParam("token") String token) {
         Optional<VerificationToken> verificationToken = userService.getVerificationToken(token);
 
@@ -77,7 +77,7 @@ public class AuthenticationController {
         }
         User user = verificationToken.get().getUser();
         Calendar calendar = Calendar.getInstance();
-        if (isVerificationTokenExpired(verificationToken.get())) {
+        if (userService.isVerificationTokenExpired(verificationToken.get())) {
             return ResponseGenerator.createBadRequestWithMessage("Token is expired");
         }
 
@@ -86,9 +86,13 @@ public class AuthenticationController {
         return ResponseGenerator.createOkRequestWithMessage("Email has been verified");
     }
 
-    private boolean isVerificationTokenExpired(VerificationToken token) {
-        Calendar calendar = Calendar.getInstance();
-        return token.getExpiryDate().getTime() - calendar.getTime().getTime() <= 0;
+    @GetMapping(value = "/signup/resendRegistrationToken")
+    public ResponseEntity<?> resendRegistrationToken(@RequestParam("token") String token) {
+        VerificationToken newToken = userService.generateNewVerificationToken(token);
+
+        userService.resendNewVerificationToken(newToken);
+
+        return ResponseGenerator.createOkRequestWithMessage("Email has been sent");
     }
 
 }

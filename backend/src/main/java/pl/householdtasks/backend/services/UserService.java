@@ -4,14 +4,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponents;
 import pl.householdtasks.backend.model.User;
 import pl.householdtasks.backend.model.VerificationToken;
 import pl.householdtasks.backend.model.dtos.UserDTO;
 import pl.householdtasks.backend.repositories.UserRepository;
 import pl.householdtasks.backend.repositories.VerificationTokenRepository;
 import pl.householdtasks.backend.services.events.OnRegistrationCompleteEvent;
+import pl.householdtasks.backend.services.events.OnResendVerificationTokenEvent;
 
+import javax.persistence.EntityNotFoundException;
+import java.util.Calendar;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 @Service
@@ -47,7 +52,6 @@ public class UserService {
     public User registerNewUser(UserDTO user) {
         User savedUser = userDetailsService.save(user);
         String url = ServletUriComponentsBuilder.fromCurrentRequest().toUriString();
-        System.out.println("publishing event");
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(url, savedUser));
 
         return savedUser;
@@ -66,4 +70,31 @@ public class UserService {
         return verificationTokenRepository.findByToken(token);
     }
 
+
+    public boolean isVerificationTokenExpired(VerificationToken token) {
+        Calendar calendar = Calendar.getInstance();
+        return token.getExpiryDate().getTime() - calendar.getTime().getTime() <= 0;
+    }
+
+    public VerificationToken generateNewVerificationToken(String token) {
+        Optional<VerificationToken> byToken = verificationTokenRepository.findByToken(token);
+        if (byToken.isPresent()) {
+            VerificationToken verificationToken = byToken.get();
+            verificationToken.setToken(UUID.randomUUID().toString());
+            verificationToken.setExpiryDate(verificationToken.calculateExpiryDate(VerificationToken.EXPIRATION));
+            return verificationTokenRepository.save(verificationToken);
+        } else {
+            throw new EntityNotFoundException("Token not found");
+        }
+    }
+
+    public void resendNewVerificationToken(VerificationToken newToken) {
+        UriComponents uriComponents = ServletUriComponentsBuilder.fromCurrentRequest().build();
+
+        String url = uriComponents.getScheme() + "://"
+                + uriComponents.getHost() + ":"
+                + uriComponents.getPort() + "/"
+                + uriComponents.getPathSegments().get(0);
+        eventPublisher.publishEvent(new OnResendVerificationTokenEvent(url, newToken));
+    }
 }
