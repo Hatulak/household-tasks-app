@@ -1,17 +1,11 @@
 package pl.householdtasks.backend.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Date;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
-@Builder
 @Entity
 @Table(name = "tasks")
 public class Task {
@@ -46,4 +40,8 @@ public class Task {
     @JoinColumn(name = "assigned_user_id")
     private User assignedUser;
 
+    public Task() {
+        this.status = TaskStatus.TODO;
+        this.creationDate = new Date();
+    }
 }

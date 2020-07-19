@@ -29,7 +29,13 @@ public class JwtUserDetailsService implements UserDetailsService {
         if (!user.isPresent()) {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
-        return new org.springframework.security.core.userdetails.User(user.get().getUsername(), user.get().getPassword(),
+        return new org.springframework.security.core.userdetails.User(
+                user.get().getUsername(),
+                user.get().getPassword(),
+                user.get().getIsEmailVerified(),
+                true,
+                true,
+                true,
                 new ArrayList<>());
     }
 
@@ -38,6 +44,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         newUser.setUsername(user.getUsername());
         newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
         newUser.setEmail(user.getEmail());
+        newUser.setIsEmailVerified(false);
         return userRepository.save(newUser);
     }
 

@@ -1,18 +1,12 @@
 package pl.householdtasks.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Set;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
-@Builder
 @Entity
 @Table(name = "appuser")
 public class User {
@@ -28,6 +22,10 @@ public class User {
     @JsonIgnore
     @Column(nullable = false)
     private String password;
+
+    @JsonIgnore
+    @Column(name = "is_email_verified", nullable = false)
+    private Boolean isEmailVerified;
 
     @ManyToMany(mappedBy = "managers")
     private Set<Group> managedGroups;
@@ -47,5 +45,10 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
+
+    public User() {
+        this.isEmailVerified = false;
+    }
+
 
 }
