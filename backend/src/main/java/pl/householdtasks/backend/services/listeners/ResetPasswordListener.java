@@ -15,11 +15,15 @@ import java.util.UUID;
 @Component
 public class ResetPasswordListener implements ApplicationListener<OnResetPasswordEvent> {
 
-    @Autowired
-    private MailService mailService;
+    private final MailService mailService;
+
+    private final UserService userService;
 
     @Autowired
-    private UserService userService;
+    public ResetPasswordListener(MailService mailService, UserService userService) {
+        this.mailService = mailService;
+        this.userService = userService;
+    }
 
     @SneakyThrows
     @Override
