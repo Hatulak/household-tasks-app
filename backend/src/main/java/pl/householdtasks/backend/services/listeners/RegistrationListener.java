@@ -15,11 +15,15 @@ import java.util.UUID;
 @Component
 public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
 
-    @Autowired
-    private MailService mailService;
+    private final MailService mailService;
+
+    private final UserService userService;
 
     @Autowired
-    private UserService userService;
+    public RegistrationListener(MailService mailService, UserService userService) {
+        this.mailService = mailService;
+        this.userService = userService;
+    }
 
 
     @SneakyThrows

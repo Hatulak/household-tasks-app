@@ -14,11 +14,15 @@ import javax.mail.MessagingException;
 @Component
 public class ResendVerificationTokenListener implements ApplicationListener<OnResendVerificationTokenEvent> {
 
-    @Autowired
-    private MailService mailService;
+    private final MailService mailService;
+
+    private final UserService userService;
 
     @Autowired
-    private UserService userService;
+    public ResendVerificationTokenListener(MailService mailService, UserService userService) {
+        this.mailService = mailService;
+        this.userService = userService;
+    }
 
 
     @SneakyThrows

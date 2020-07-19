@@ -26,23 +26,27 @@ import java.util.regex.Pattern;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    private final JwtUserDetailsService userDetailsService;
+
+    private final ApplicationEventPublisher eventPublisher;
+
+    private final VerificationTokenRepository verificationTokenRepository;
+
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+
+    private final PasswordEncoder bcryptEncoder;
 
     @Autowired
-    private JwtUserDetailsService userDetailsService;
-
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
-
-    @Autowired
-    private VerificationTokenRepository verificationTokenRepository;
-
-    @Autowired
-    private PasswordResetTokenRepository passwordResetTokenRepository;
-
-    @Autowired
-    private PasswordEncoder bcryptEncoder;
+    public UserService(UserRepository userRepository, JwtUserDetailsService userDetailsService, ApplicationEventPublisher eventPublisher, VerificationTokenRepository verificationTokenRepository, PasswordResetTokenRepository passwordResetTokenRepository, PasswordEncoder bcryptEncoder) {
+        this.userRepository = userRepository;
+        this.userDetailsService = userDetailsService;
+        this.eventPublisher = eventPublisher;
+        this.verificationTokenRepository = verificationTokenRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.bcryptEncoder = bcryptEncoder;
+    }
 
     public boolean checkIfUserWithUsernameExists(String username) {
         Optional<User> byUsername = userRepository.findByUsername(username);
