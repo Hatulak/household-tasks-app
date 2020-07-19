@@ -2,16 +2,20 @@ package pl.householdtasks.backend.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
+import pl.householdtasks.backend.model.PasswordResetToken;
 import pl.householdtasks.backend.model.User;
 import pl.householdtasks.backend.model.VerificationToken;
 import pl.householdtasks.backend.model.dtos.UserDTO;
+import pl.householdtasks.backend.repositories.PasswordResetTokenRepository;
 import pl.householdtasks.backend.repositories.UserRepository;
 import pl.householdtasks.backend.repositories.VerificationTokenRepository;
 import pl.householdtasks.backend.services.events.OnRegistrationCompleteEvent;
 import pl.householdtasks.backend.services.events.OnResendVerificationTokenEvent;
+import pl.householdtasks.backend.services.events.OnResetPasswordEvent;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Calendar;
@@ -34,6 +38,12 @@ public class UserService {
     @Autowired
     private VerificationTokenRepository verificationTokenRepository;
 
+    @Autowired
+    private PasswordResetTokenRepository passwordResetTokenRepository;
+
+    @Autowired
+    private PasswordEncoder bcryptEncoder;
+
     public boolean checkIfUserWithUsernameExists(String username) {
         Optional<User> byUsername = userRepository.findByUsername(username);
         return byUsername.isPresent();
@@ -42,6 +52,10 @@ public class UserService {
     public boolean checkIfUserWithEmailExists(String email) {
         Optional<User> byUsername = userRepository.findByEmail(email);
         return byUsername.isPresent();
+    }
+
+    public Optional<User> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     public boolean isEmailValid(String email) {
@@ -96,5 +110,39 @@ public class UserService {
                 + uriComponents.getPort() + "/"
                 + uriComponents.getPathSegments().get(0);
         eventPublisher.publishEvent(new OnResendVerificationTokenEvent(url, newToken));
+    }
+
+    public void sendPasswordResetToken(User user) {
+        UriComponents uriComponents = ServletUriComponentsBuilder.fromCurrentRequest().build();
+
+        String url = uriComponents.getScheme() + "://"
+                + uriComponents.getHost() + ":"
+                + uriComponents.getPort() + "/"
+                + uriComponents.getPathSegments().get(0);
+
+        eventPublisher.publishEvent(new OnResetPasswordEvent(url, user));
+    }
+
+    public PasswordResetToken createPasswordResetToken(User user, String token) {
+        PasswordResetToken passwordResetToken = new PasswordResetToken(user, token);
+        return passwordResetTokenRepository.save(passwordResetToken);
+    }
+
+    public Optional<PasswordResetToken> getPasswordResetToken(String token) {
+        return passwordResetTokenRepository.findByToken(token);
+    }
+
+    public boolean isPasswordResetTokenExpired(PasswordResetToken passwordResetToken) {
+        Calendar calendar = Calendar.getInstance();
+        return passwordResetToken.getExpiryDate().getTime() - calendar.getTime().getTime() <= 0;
+    }
+
+    public void changePassword(User user, String newPassword) {
+        user.setPassword(bcryptEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    public void deletePasswordRequestToken(PasswordResetToken passwordResetToken) {
+        passwordResetTokenRepository.delete(passwordResetToken);
     }
 }
