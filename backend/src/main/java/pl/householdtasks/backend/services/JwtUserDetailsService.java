@@ -1,6 +1,8 @@
 package pl.householdtasks.backend.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
+@DependsOn({"userRepository", "passwordEncoder"})
 public class JwtUserDetailsService implements UserDetailsService {
 
     private UserRepository userRepository;
