@@ -1,0 +1,19 @@
+version: '3'
+services:
+  household-task-app:
+    build: ./backend
+    ports:
+       - "8092:8090"
+    depends_on:
+       - database_postgres_dev
+    environment:
+      - "SPRING_PROFILES_ACTIVE=prod"
+  database_postgres_prod:
+    container_name: 'postgres_prod'
+    image: postgres
+    environment:
+       POSTGRES_USER: postgres
+       POSTGRES_PASSWORD: postgres
+       POSTGRES_DB: household-prod
+    ports:
+      - "54321:5432"
